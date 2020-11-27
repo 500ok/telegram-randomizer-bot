@@ -1,5 +1,8 @@
 package org.randomizer.config;
 
+import kong.unirest.Unirest;
+import kong.unirest.jackson.JacksonObjectMapper;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
@@ -15,6 +18,14 @@ public class Config {
     public static void load(String propertiesConfig) throws IOException {
         settings.load(Config.class.getResourceAsStream(propertiesConfig));
         loadEnvValues();
+        configureUnirest();
+    }
+
+    private static void configureUnirest() {
+        Unirest.config()
+                .enableCookieManagement(false)
+                .concurrency(10, 5)
+                .cacheResponses(false);
     }
 
     private static void loadEnvValues() {
