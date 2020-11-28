@@ -1,57 +1,44 @@
 package org.randomizer.randomizer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import org.randomizer.config.Config;
 import org.randomizer.model.Game;
 
+import java.util.Map;
 import java.util.Random;
 
 public class GameRandomizer {
 
-    private final Gson gson = new Gson();
-    private final Random random = new Random();
-    private final String servicePath = "https://rawg-video-games-database.p.rapidapi.com/games";
-    private final String token = Config.getProperty("game.token");
-    private final ObjectMapper mapper = new ObjectMapper();
+    private static final Random random = new Random();
+    private static final String servicePath = "https://rawg-video-games-database.p.rapidapi.com/games";
+    private static final String token = Config.getProperty("game.token");
+    private static final Map<String, String> headers;
 
-    {
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    static  {
+        headers = Map.of(
+                "x-rapidapi-key", token,
+                "x-rapidapi-host", "rawg-video-games-database.p.rapidapi.com"
+        );
     }
 
     public Game getRandomGame() {
-        int random =  getRandomGamePage();
+        int random =  generateGameNumber();
 
-        System.out.println(random);
-
-        JsonNode json = Unirest
-                            .get(servicePath + "/{id}")
-                            .routeParam("id",String.valueOf(random))
-                            .responseEncoding("UTF-8")
-                            .header("x-rapidapi-key", token)
-                            .header("x-rapidapi-host", "rawg-video-games-database.p.rapidapi.com")
-                            .asJson().getBody();
-
-
-        try {
-            return mapper.readValue(json.toString(), Game.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return Unirest
+                    .get(servicePath + "/{id}")
+                    .routeParam("id",String.valueOf(random))
+                    .headers(headers)
+                    .asObject(Game.class)
+                    .getBody();
     }
 
-    private int getRandomGamePage() {
+    private int generateGameNumber() {
         HttpResponse<JsonNode> response = Unirest
                 .get(servicePath)
                 .queryString("page_size", 1)
-                .header("x-rapidapi-key", token)
-                .header("x-rapidapi-host", "rawg-video-games-database.p.rapidapi.com")
+                .headers(headers)
                 .asJson();
 
         return random.nextInt((int) response.getBody().getObject().get("count"));

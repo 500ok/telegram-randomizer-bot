@@ -1,5 +1,6 @@
 package org.randomizer;
 
+import kong.unirest.Unirest;
 import org.randomizer.bot.RandomizerBot;
 import org.randomizer.config.Config;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
