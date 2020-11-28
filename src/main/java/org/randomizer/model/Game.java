@@ -4,6 +4,7 @@ package org.randomizer.model;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.randomizer.util.GameDeserializer;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ public class Game {
     private String description;
     private List<String> platforms;
     private List<String> genres;
+    private LocalDate releaseDate;
     private Map<String, String> stores;
 
     public String getName() {
@@ -41,6 +43,10 @@ public class Game {
         return stores;
     }
 
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -49,9 +55,7 @@ public class Game {
         this.backgroundImage = backgroundImage;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public void setDescription(String description) { this.description = description; }
 
     public void setPlatforms(List<String> platforms) {
         this.platforms = platforms;
@@ -65,22 +69,27 @@ public class Game {
         this.stores = stores;
     }
 
+    public void setReleaseDate(LocalDate releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(
                 "*Name*: \n" + name + '\n' +
                 "*Description*: \n" + description + '\n' +
                 "*Genres*: \n" + genres + '\n' +
+                "*Release date*: \n" + releaseDate + '\n' +
                 "*Platforms*: \n" + platforms + '\n');
 
         builder.append("*Stores*: \n");
 
         for (Map.Entry<String, String> store: stores.entrySet()) {
-            builder.append(String.format("[%s](%s)",
+            builder.append(String.format("_%s_: `%s` %n",
                     store.getKey(), store.getValue()));
         }
 
-        builder.append("[ ](").append(backgroundImage).append(")");
+        builder.append(String.format("[.](%s) ", backgroundImage));
 
         return builder.toString();
     }
