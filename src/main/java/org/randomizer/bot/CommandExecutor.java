@@ -1,5 +1,6 @@
 package org.randomizer.bot;
 
+import org.randomizer.model.Game;
 import org.randomizer.randomizer.GameRandomizer;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -16,16 +17,16 @@ public class CommandExecutor {
         this.message = message;
     }
 
-    //todo
     public SendMessage execute() {
         if (message.getText().equalsIgnoreCase("/game")) {
-            String text = randomizerService.getRandomGame()
-                    .toString();
+            Game game = randomizerService.getRandomGame();
+
+            if (game == null) return execute();
 
             return SendMessage.builder()
                     .chatId(String.valueOf(message.getChatId()))
                     .parseMode("markdown")
-                    .text(text)
+                    .text(game.toString())
                     .build();
         }
 

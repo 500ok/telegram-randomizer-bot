@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.Unirest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -13,6 +15,7 @@ import java.util.Properties;
 public class Config {
 
     private static final Properties settings = new Properties();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
 
     public static String getProperty(String property) {
         return settings.getProperty(property);
@@ -21,12 +24,15 @@ public class Config {
 
 
     public static void load(String propertiesConfig) throws IOException {
+        LOGGER.debug("Loading configuration");
         settings.load(Config.class.getResourceAsStream(propertiesConfig));
         loadEnvValues();
         configureUnirest();
+        LOGGER.debug("Configuration loaded");
     }
 
     private static void configureUnirest() {
+        LOGGER.debug("Loading unirest configuration");
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(
                 DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
@@ -59,6 +65,7 @@ public class Config {
                         }
                     }
                 }).cacheResponses(false);
+        LOGGER.debug("Unirest configuration loaded");
     }
 
     private static void loadEnvValues() {

@@ -2,11 +2,14 @@ package org.randomizer.bot;
 
 import kong.unirest.Unirest;
 import org.randomizer.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,6 +19,7 @@ public class RandomizerBot extends TelegramLongPollingBot {
     private static final String name = Config.getProperty("bot.name");
     private static final String token = Config.getProperty("bot.token");
     private static final ExecutorService executor = Executors.newFixedThreadPool(10);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RandomizerBot.class);
 
     @Override
     public String getBotUsername() {
@@ -35,9 +39,12 @@ public class RandomizerBot extends TelegramLongPollingBot {
             ).thenAccept(
                     (message) -> {
                         try {
-                            executeAsync(message);
+                            execute(message);
                         } catch (TelegramApiException e) {
-                            e.printStackTrace();
+                            LOGGER.error("Bot error: {}, {}",
+                                    e.getMessage(),
+                                    Arrays.toString(e.getStackTrace()));
+                            onUpdateReceived(update);
                         }
                     }
             );
