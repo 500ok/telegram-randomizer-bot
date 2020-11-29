@@ -1,7 +1,6 @@
 package org.randomizer.util;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -31,14 +30,21 @@ public class GameDeserializer extends StdDeserializer<Game> {
     @Override
     public Game deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
     {
-        LOGGER.trace("Deserializing game");
+        LOGGER.debug("Deserializing game");
         Game game = new Game();
         JsonNode root;
+
         try {
             root = jsonParser.getCodec().readTree(jsonParser);
         } catch (IOException e) {
-            LOGGER.error("Error while deserializing game json: {}", e.getMessage());
+            LOGGER.error("Error while deserializing game json: {}", e.toString());
             return null;
+        }
+
+        if (root.findValue("redirect") != null) {
+            game.setRedirect(root.get("redirect").booleanValue());
+            game.setName(root.get("slug").textValue());
+            return game;
         }
 
         game.setName(root.get("name").textValue());
@@ -77,7 +83,7 @@ public class GameDeserializer extends StdDeserializer<Game> {
             game.setStores(stores);
         }
 
-        LOGGER.trace("Game deserialized");
+        LOGGER.debug("Game deserialized");
         return game;
     }
 }

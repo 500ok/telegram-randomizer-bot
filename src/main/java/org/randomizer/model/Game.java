@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @JsonDeserialize(using = GameDeserializer.class)
-public class Game {
+public class Game implements FormattedMessage {
 
     private String name;
     private String backgroundImage;
@@ -17,10 +17,17 @@ public class Game {
     private List<String> platforms;
     private List<String> genres;
     private LocalDate releaseDate;
+    private boolean redirect;
     private Map<String, String> stores;
+
+    public Game() {}
 
     public String getName() {
         return name;
+    }
+
+    public void setRedirect(boolean redirect) {
+        this.redirect = redirect;
     }
 
     public String getBackgroundImage() {
@@ -47,7 +54,14 @@ public class Game {
         return releaseDate;
     }
 
+    public boolean isRedirect() {
+        return redirect;
+    }
+
     public void setName(String name) {
+        if (name.length() > 2500) {
+            name = name.substring(2500) + "...";
+        }
         this.name = name;
     }
 
@@ -74,22 +88,24 @@ public class Game {
     }
 
     @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder(
-                "*Name*: \n" + name + '\n' +
-                "*Description*: \n" + description + '\n' +
-                "*Genres*: \n" + genres + '\n' +
-                "*Release date*: \n" + releaseDate + '\n' +
-                "*Platforms*: \n" + platforms + '\n');
-
+    public String format() {
+        StringBuilder builder = new StringBuilder("*Name*: \n" + name + '\n');
+        if (description != null) {
+            builder.append("*Description*: \n")
+                    .append(description.replaceAll("[_*<>]", ""))
+                    .append('\n');
+        }
+        builder.append("*Genres*: \n").append(genres).append('\n');
+        builder.append("*Release date*: \n").append(releaseDate).append('\n');
+        builder.append("*Platforms*: \n").append(platforms).append('\n');
         builder.append("*Stores*: \n");
 
         for (Map.Entry<String, String> store: stores.entrySet()) {
-            builder.append(String.format("_%s_: `%s` %n",
+            builder.append(String.format("_%s_ `%s`\n",
                     store.getKey(), store.getValue()));
         }
 
-        builder.append(String.format("[.](%s) ", backgroundImage));
+        builder.append(String.format("[image](%s) ", backgroundImage));
 
         return builder.toString();
     }

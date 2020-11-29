@@ -1,9 +1,7 @@
 package org.randomizer.randomizer;
 
-import kong.unirest.HttpResponse;
-import kong.unirest.JsonNode;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestParsingException;
+import kong.unirest.*;
+import kong.unirest.json.JSONObject;
 import org.randomizer.config.Config;
 import org.randomizer.model.Game;
 import org.slf4j.Logger;
@@ -30,53 +28,79 @@ public class GameRandomizer {
     }
 
     public Game getRandomGame() {
-        int random =  generateGameNumber();
-        LOGGER.debug("Request game with number {}", random);
+        String randomId =  generateGameId();
+        Game game = getGameById(randomId);
+        LOGGER.debug("Game randomized: {}", game.getName());
+        return game;
+    }
 
-        HttpResponse<Game> response = Unirest
-                                        .get(servicePath + "/{id}")
-                                        .routeParam("id",String.valueOf(random))
-                                        .headers(headers)
-                                        .asObject(Game.class);
+    private Game getGameById(String id) {
 
+        HttpRequest<?> request = Unirest.get(servicePath + "/{id}")
+                                    .routeParam("id", id)
+                                    .headers(headers);
+        LOGGER.debug("Request {} game: {}", id, request.getUrl());
 
-        LOGGER.debug("Response status {}: {}", response.getStatus(), response.getStatusText());
+        HttpResponse<Game> response = request.asObject(Game.class);
+
+        LOGGER.debug("Game {} response status: {}", response.getStatus(), response.getStatusText());
 
         if (response.getStatus() != 200) {
-            LOGGER.debug("Trying to get game again");
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                LOGGER.error(e.getMessage());
-                return null;
-            }
-            return getRandomGame();
+            LOGGER.error("Trying to get {} game again", id);
+            return getGameById(id);
         }
 
         Game game = response.getBody();
 
-        Optional<UnirestParsingException> exception = response.getParsingError();
-        if(exception.isPresent()){
-            LOGGER.error("Unirest parsing exception with response body {}: {}",
-                    response.getBody(),
-                    exception.get().getMessage());
-            return null;
+        if (game.isRedirect()) {
+            LOGGER.debug("Received redirect game, request redirected game {}", game.getName());
+            return getGameById(game.getName());
         }
 
-        LOGGER.debug("Randomized game: {}", game.getName());
+        Optional<UnirestParsingException> exception = response.getParsingError();
+        if(exception.isPresent()){
+            LOGGER.error("Unirest game {} parsing exception {}: {}",
+                    id,
+                    request.getUrl(),
+                    exception.get().toString());
+            LOGGER.error("Trying get game with id {}", id);
+            return getGameById(id);
+        }
 
         return game;
     }
 
-    private int generateGameNumber() {
-        LOGGER.debug("Generating random number");
-        HttpResponse<JsonNode> response = Unirest
+    private String generateGameId() {
+        HttpRequest<?> request = Unirest
                 .get(servicePath)
                 .queryString("stores", List.of(1,2,3,5,6,10,11))
                 .queryString("page_size", 1)
-                .headers(headers)
-                .asJson();
+                .headers(headers);
 
-        return random.nextInt((int) response.getBody().getObject().get("count"));
+        LOGGER.debug("Generating random id: {}", request.getUrl());
+
+        HttpResponse<JsonNode> response = request.asJson();
+
+        LOGGER.debug("Game id response status {}", response.getStatus());
+        if (response.getStatus() != 200) {
+            LOGGER.error("Error getting game id, retrying to get id");
+            return generateGameId();
+        }
+
+        Optional<UnirestParsingException> exception = response.getParsingError();
+        if(exception.isPresent()){
+            LOGGER.error("Unirest id parsing exception {}: {}",
+                    exception.get().getOriginalBody(),
+                    exception.get().toString()
+            );
+            LOGGER.error("Trying to get a random game id");
+            return generateGameId();
+        }
+
+        JSONObject jsonBody = response.getBody().getObject();
+        String identifier = String.valueOf(random.nextInt((int) jsonBody.get("count")));
+
+        LOGGER.debug("Generated id {}", identifier);
+        return identifier;
     }
 }
