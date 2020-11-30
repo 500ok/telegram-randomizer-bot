@@ -10,11 +10,10 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class GameRandomizer {
 
-    private static final Random random = new Random();
     private static final String servicePath = "https://rawg-video-games-database.p.rapidapi.com/games";
     private static final String token = Config.getProperty("game.token");
     private static final Map<String, String> headers;
@@ -30,7 +29,7 @@ public class GameRandomizer {
     public Game getRandomGame() {
         String randomId =  generateGameId();
         Game game = getGameById(randomId);
-        LOGGER.debug("Game randomized: {}", game.getName());
+        LOGGER.debug("Game randomized: {}", randomId);
         return game;
     }
 
@@ -46,8 +45,8 @@ public class GameRandomizer {
         LOGGER.debug("Game {} response status: {}", response.getStatus(), response.getStatusText());
 
         if (response.getStatus() != 200) {
-            LOGGER.error("Trying to get {} game again", id);
-            return getGameById(id);
+            LOGGER.error("Error while retrieving {} game", id);
+            return null;
         }
 
         Game game = response.getBody();
@@ -63,8 +62,7 @@ public class GameRandomizer {
                     id,
                     request.getUrl(),
                     exception.get().toString());
-            LOGGER.error("Trying get game with id {}", id);
-            return getGameById(id);
+            return null;
         }
 
         return game;
@@ -77,30 +75,30 @@ public class GameRandomizer {
                 .queryString("page_size", 1)
                 .headers(headers);
 
-        LOGGER.debug("Generating random id: {}", request.getUrl());
+        LOGGER.debug("Generating random game id: {}", request.getUrl());
 
         HttpResponse<JsonNode> response = request.asJson();
 
         LOGGER.debug("Game id response status {}", response.getStatus());
         if (response.getStatus() != 200) {
-            LOGGER.error("Error getting game id, retrying to get id");
-            return generateGameId();
+            LOGGER.error("Error getting game id");
+            return null;
         }
 
         Optional<UnirestParsingException> exception = response.getParsingError();
         if(exception.isPresent()){
-            LOGGER.error("Unirest id parsing exception {}: {}",
+            LOGGER.error("Unirest game id parsing exception {}: {}",
                     exception.get().getOriginalBody(),
                     exception.get().toString()
             );
-            LOGGER.error("Trying to get a random game id");
-            return generateGameId();
+            return null;
         }
 
         JSONObject jsonBody = response.getBody().getObject();
-        String identifier = String.valueOf(random.nextInt((int) jsonBody.get("count")));
+        String identifier = String.valueOf(ThreadLocalRandom.current()
+                .nextInt(0 ,(int) jsonBody.get("count")));
 
-        LOGGER.debug("Generated id {}", identifier);
+        LOGGER.debug("Generated game id {}", identifier);
         return identifier;
     }
 }

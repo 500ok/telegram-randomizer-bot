@@ -83,7 +83,7 @@ public class GameDeserializer extends StdDeserializer<Game> {
             game.setStores(stores);
         }
 
-        LOGGER.debug("Game deserialized");
+        LOGGER.debug("Game \"{}\" deserialized", game.getName());
         return game;
     }
 }

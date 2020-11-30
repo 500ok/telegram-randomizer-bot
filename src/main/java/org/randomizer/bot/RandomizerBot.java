@@ -5,7 +5,6 @@ import org.randomizer.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -37,32 +36,16 @@ public class RandomizerBot extends TelegramLongPollingBot {
                     executor
             ).thenAccept(
                 (message) -> {
-                    int attempts = 5;
-
-                    while (attempts-->0) {
-                        if (sendMessage(message)) {
-                            return;
-                        }
-                        if (attempts != 0) {
-                            LOGGER.error("Attempt to resend message {}", message.getChatId());
-                        }
+                    try {
+                        execute(message);
+                    } catch (TelegramApiException e) {
+                        LOGGER.error("Bot error {}: {}",
+                                message.getChatId(),
+                                e.toString()
+                        );
                     }
-                    LOGGER.error("Can't send message to {}", message.getChatId());
                 }
             );
-    }
-
-    private boolean sendMessage(SendMessage message) {
-        try {
-            execute(message);
-            return true;
-        } catch (TelegramApiException e) {
-            LOGGER.error("Bot error {}: {}",
-                    message.getChatId(),
-                    e.toString()
-            );
-            return false;
-        }
     }
 
     @Override

@@ -88,7 +88,7 @@ public class Game implements FormattedMessage {
     }
 
     @Override
-    public String format() {
+    public String getFormattedMessage() {
         StringBuilder builder = new StringBuilder("*Name*: \n" + name + '\n');
         if (description != null) {
             builder.append("*Description*: \n")
