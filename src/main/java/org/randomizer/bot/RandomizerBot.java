@@ -1,9 +1,10 @@
 package org.randomizer.bot;
 
 import kong.unirest.Unirest;
-import org.randomizer.config.Config;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -12,12 +13,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Slf4j
+@Component
 public class RandomizerBot extends TelegramLongPollingBot {
 
-    private static final String name = Config.getProperty("bot.name");
-    private static final String token = Config.getProperty("bot.token");
-    private static final ExecutorService executor = Executors.newFixedThreadPool(10);
-    private static final Logger LOGGER = LoggerFactory.getLogger(RandomizerBot.class);
+    @Value("${bot.token}")
+    private String token;
+    @Value("${bot.name}")
+    private String name;
+    @Autowired
+    private CommandExecutor commandExecutor;
+    private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     @Override
     public String getBotUsername() {
@@ -31,21 +37,20 @@ public class RandomizerBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-            CompletableFuture.supplyAsync(
-                    () -> new CommandExecutor(update.getMessage()).execute(),
-                    executor
-            ).thenAccept(
-                (message) -> {
-                    try {
-                        execute(message);
-                    } catch (TelegramApiException e) {
-                        LOGGER.error("Bot error {}: {}",
-                                message.getChatId(),
-                                e.toString()
-                        );
-                    }
+        CompletableFuture.supplyAsync(
+                () -> commandExecutor.execute(update.getMessage()), executor
+        ).thenAcceptAsync(
+            (message) -> {
+                try {
+                    execute(message);
+                } catch (TelegramApiException e) {
+                    log.error("Bot error {}: {}",
+                            message.getChatId(),
+                            e.toString()
+                    );
                 }
-            );
+            }
+        );
     }
 
     @Override

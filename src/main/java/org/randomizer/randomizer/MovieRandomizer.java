@@ -3,24 +3,29 @@ package org.randomizer.randomizer;
 import kong.unirest.*;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
-import org.randomizer.config.Config;
+import lombok.extern.slf4j.Slf4j;
 import org.randomizer.model.Movie;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Slf4j
+@Service
 public class MovieRandomizer {
     private static final String servicePath = "https://api.themoviedb.org/3";
-    private static final String token = Config.getProperty("movie.token");
-    private static final Logger LOGGER = LoggerFactory.getLogger(MovieRandomizer.class);
+    private final String token;
     private static final int total_pages = 500;
+
+    public MovieRandomizer(@Value("${movie.token}") String token) {
+        this.token = token;
+    }
 
     public Movie getRandomMovie() {
         String randomId = getRandomMovieId();
         Movie movie = getRandomMovieById(randomId);
-        LOGGER.debug("Movie randomized: {}", randomId);
+        log.debug("Movie randomized: {}", randomId);
         return movie;
     }
 
@@ -29,12 +34,12 @@ public class MovieRandomizer {
                 .queryString("api_key", token)
                 .routeParam("id", id);
 
-        LOGGER.debug("Request {} movie: {}", id, request.getUrl());
+        log.debug("Request {} movie: {}", id, request.getUrl());
         HttpResponse<Movie> response = request.asObject(Movie.class);
-        LOGGER.debug("Movie {} response status {}: {}", id, response.getStatus(), response.getStatusText());
+        log.debug("Movie {} response status {}: {}", id, response.getStatus(), response.getStatusText());
 
         if (response.getStatus() != 200) {
-            LOGGER.error("Error while retrieving {} movie", id);
+            log.error("Error while retrieving {} movie", id);
             return null;
         }
 
@@ -42,7 +47,7 @@ public class MovieRandomizer {
 
         Optional<UnirestParsingException> exception = response.getParsingError();
         if(exception.isPresent()){
-            LOGGER.error("Unirest movie {} parsing exception {}: {}",
+            log.error("Unirest movie {} parsing exception {}: {}",
                     id,
                     request.getUrl(),
                     exception.get().toString());
@@ -57,18 +62,18 @@ public class MovieRandomizer {
                 .queryString("api_key", token)
                 .queryString("page", ThreadLocalRandom.current().nextInt(total_pages));
 
-        LOGGER.debug("Generating random movie id: {}", request.getUrl());
+        log.debug("Generating random movie id: {}", request.getUrl());
         HttpResponse<JsonNode> response = request.asJson();
-        LOGGER.debug("Movie id response status {}", response.getStatus());
+        log.debug("Movie id response status {}", response.getStatus());
 
         if (response.getStatus() != 200) {
-            LOGGER.error("Error getting movie id");
+            log.error("Error getting movie id");
             return null;
         }
 
         Optional<UnirestParsingException> exception = response.getParsingError();
         if(exception.isPresent()){
-            LOGGER.error("Unirest movie id parsing exception {}: {}",
+            log.error("Unirest movie id parsing exception {}: {}",
                     exception.get().getOriginalBody(),
                     exception.get().toString()
             );
@@ -81,7 +86,7 @@ public class MovieRandomizer {
 
         String identifier = jsonMovie.get("id").toString();
 
-        LOGGER.debug("Generated movie id {}", identifier);
+        log.debug("Generated movie id {}", identifier);
         return identifier;
     }
 }

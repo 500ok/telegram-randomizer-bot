@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import lombok.extern.slf4j.Slf4j;
 import org.randomizer.model.Game;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,14 +16,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class GameDeserializer extends StdDeserializer<Game> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GameDeserializer.class);
 
     public GameDeserializer() {
         this(null);
     }
-
     protected GameDeserializer(Class<?> vc) {
         super(vc);
     }
@@ -30,14 +29,14 @@ public class GameDeserializer extends StdDeserializer<Game> {
     @Override
     public Game deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
     {
-        LOGGER.debug("Deserializing game");
+        log.debug("Deserializing game");
         Game game = new Game();
         JsonNode root;
 
         try {
             root = jsonParser.getCodec().readTree(jsonParser);
         } catch (IOException e) {
-            LOGGER.error("Error while deserializing game json: {}", e.toString());
+            log.error("Error while deserializing game json: {}", e.toString());
             return null;
         }
 
@@ -51,7 +50,9 @@ public class GameDeserializer extends StdDeserializer<Game> {
         game.setDescription(root.get("description_raw").textValue());
         game.setBackgroundImage(root.get("background_image").textValue());
 
-        game.setReleaseDate(LocalDate.parse(root.get("released").textValue()));
+        String released = root.get("released").textValue();
+        LocalDate releasedDate = released != null? LocalDate.parse(released): null;
+        game.setReleaseDate(releasedDate);
 
         JsonNode platformsNode = root.get("platforms");
         if (platformsNode.isArray()){
@@ -83,7 +84,7 @@ public class GameDeserializer extends StdDeserializer<Game> {
             game.setStores(stores);
         }
 
-        LOGGER.debug("Game \"{}\" deserialized", game.getName());
+        log.debug("Game \"{}\" deserialized", game.getName());
         return game;
     }
 }

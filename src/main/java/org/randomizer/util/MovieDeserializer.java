@@ -5,40 +5,34 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import org.randomizer.model.Game;
+import lombok.extern.slf4j.Slf4j;
 import org.randomizer.model.Movie;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
+@Slf4j
 public class MovieDeserializer extends StdDeserializer<Movie> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MovieDeserializer.class);
 
     public MovieDeserializer() {
         this(null);
     }
-
     protected MovieDeserializer(Class<?> vc) {
         super(vc);
     }
 
     @Override
-    public Movie deserialize(JsonParser jsonParser, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        LOGGER.debug("Deserializing movie");
+    public Movie deserialize(JsonParser jsonParser, DeserializationContext context) {
+        log.debug("Deserializing movie");
         Movie movie = new Movie();
         JsonNode root;
 
         try {
             root = jsonParser.getCodec().readTree(jsonParser);
         } catch (IOException e) {
-            LOGGER.error("Error while deserializing movie json: {}", e.toString());
+            log.error("Error while deserializing movie json: {}", e.toString());
             return null;
         }
 
@@ -66,7 +60,7 @@ public class MovieDeserializer extends StdDeserializer<Movie> {
             movie.setGenres(genres);
         }
 
-        LOGGER.debug("Movie \"{}\" deserialized", movie.getTitle());
+        log.debug("Movie \"{}\" deserialized", movie.getTitle());
         return movie;
     }
 }
