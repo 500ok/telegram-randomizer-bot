@@ -1,5 +1,8 @@
 package org.randomizer.bot;
 
+import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
+import kong.unirest.Unirest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,8 +12,7 @@ import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import javax.annotation.PostConstruct;
 
 @Slf4j
 @Component
@@ -25,11 +27,20 @@ public class RandomizerBot extends TelegramWebhookBot {
     @Autowired
     private CommandExecutor commandExecutor;
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
     public RandomizerBot(@Autowired DefaultBotOptions options) {
         super(options);
     }
+
+    @PostConstruct
+    public void init() {
+        log.debug("Register {} bot", name);
+        HttpResponse<JsonNode> request = Unirest.post(
+                    String.format("https://api.telegram.org/bot%s/setWebhook?url=%s",
+                            getBotToken(), getBotPath())).asJson();
+        log.debug("Bot {} was registered", name);
+    }
+
+
 
     @Override
     public String getBotPath() {
