@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import lombok.extern.slf4j.Slf4j;
 import org.randomizer.model.Game;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -41,8 +39,8 @@ public class GameDeserializer extends StdDeserializer<Game> {
         }
 
         if (root.findValue("redirect") != null) {
-            game.setRedirect(root.get("redirect").booleanValue());
-            game.setName(root.get("slug").textValue());
+            game.setName("redirect");
+            game.setDescription(root.get("slug").textValue());
             return game;
         }
 

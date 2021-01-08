@@ -18,6 +18,7 @@ public class UnirestConfig {
 
     @PostConstruct
     public void initUnirest() {
+        Unirest.config().reset();
         log.debug("Loading unirest configuration");
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(

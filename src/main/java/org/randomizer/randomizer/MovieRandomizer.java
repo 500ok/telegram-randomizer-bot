@@ -15,12 +15,11 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class MovieRandomizer {
     private static final String servicePath = "https://api.themoviedb.org/3";
-    private final String token;
+    @Value("${movie.token}")
+    private String token;
     private static final int total_pages = 500;
 
-    public MovieRandomizer(@Value("${movie.token}") String token) {
-        this.token = token;
-    }
+    public MovieRandomizer() { }
 
     public Movie getRandomMovie() {
         String randomId = getRandomMovieId();
@@ -62,7 +61,7 @@ public class MovieRandomizer {
                 .queryString("api_key", token)
                 .queryString("page", ThreadLocalRandom.current().nextInt(total_pages));
 
-        log.debug("Generating random movie id: {}", request.getUrl());
+        log.debug("Generating random movie id");
         HttpResponse<JsonNode> response = request.asJson();
         log.debug("Movie id response status {}", response.getStatus());
 

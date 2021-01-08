@@ -7,6 +7,7 @@ import org.randomizer.model.Game;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -16,14 +17,15 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GameRandomizer {
 
     private static final String servicePath = "https://rawg-video-games-database.p.rapidapi.com/games";
-    private final String token;
-    private final Map<String, String> headers;
+    @Value("${game.token}")
+    private String token;
+    private Map<String, String> headers;
 
-    public GameRandomizer(@Value("${game.token}") String token) {
-        this.token = token;
+    @PostConstruct
+    private void init() {
         headers = Map.of(
-                    "x-rapidapi-key", token,
-                    "x-rapidapi-host", "rawg-video-games-database.p.rapidapi.com"
+                "x-rapidapi-key", token,
+                "x-rapidapi-host", "rawg-video-games-database.p.rapidapi.com"
         );
     }
 
@@ -54,7 +56,7 @@ public class GameRandomizer {
 
         Game game = response.getBody();
 
-        if (game.isRedirect()) {
+        if (game.getName().equals("redirect")) {
             log.debug("Received redirect game, request redirected game {}", game.getName());
             return getGameById(game.getName());
         }

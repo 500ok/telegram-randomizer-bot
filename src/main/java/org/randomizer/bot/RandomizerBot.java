@@ -25,14 +25,14 @@ public class RandomizerBot extends TelegramWebhookBot {
     private String name;
 
     @Autowired
-    private CommandExecutor commandExecutor;
+    private MessageHandler messageHandler;
 
     public RandomizerBot(@Autowired DefaultBotOptions options) {
         super(options);
     }
 
     @PostConstruct
-    public void init() {
+    private void init() {
         log.debug("Register {} bot", name);
         HttpResponse<JsonNode> request = Unirest.post(
                     String.format("https://api.telegram.org/bot%s/setWebhook?url=%s",
@@ -59,6 +59,6 @@ public class RandomizerBot extends TelegramWebhookBot {
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-        return commandExecutor.execute(update.getMessage());
+        return messageHandler.handle(update.getMessage());
     }
 }
