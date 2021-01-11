@@ -1,43 +1,39 @@
 package org.randomizer.model;
 
 public enum GameGenre {
-    ACTION("action"),
-    INDIE("indie"),
-    ADVENTURE("adventure"),
-    RPG("rpg"),
-    STRATEGY("strategy"),
-    SHOOTER("shooter"),
-    CASUAL("casual"),
-    SIMULATION("simulation"),
-    PUZZLE("puzzle"),
-    ARCADE("arcade"),
-    PLATFORMER("platformer"),
-    RACING("racing"),
-    SPORTS("sports"),
-    MMO("massively-multiplayer"),
-    FIGHTING("fighting"),
-    FAMILY("family"),
-    BOARD_GAMES("board-games"),
-    EDUCATIONAL("educational"),
-    CARD("card")
+    ACTION(4),
+    INDIE(51),
+    ADVENTURE(3),
+    RPG(5),
+    STRATEGY(10),
+    SHOOTER(2),
+    CASUAL(40),
+    SIMULATION(14),
+    PUZZLE(7),
+    ARCADE(11),
+    PLATFORMER(83),
+    RACING(1),
+    SPORTS(15),
+    MMO(59),
+    FIGHTING(6),
+    FAMILY(19),
+    BOARD_GAMES(28),
+    EDUCATIONAL(34),
+    CARD(17)
 
     ;
 
-    private String name;
+    private int id;
 
-    GameGenre(String name) {
-        this.name = name;
+    GameGenre(int id) {
+        this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getReadableName() {
-        return this.toString().replaceAll("[\\-_]", " ");
+    public int getId() {
+        return id;
     }
 
     public static GamePlatform getValueByName(String name) {
-        return GamePlatform.valueOf(name.toUpperCase().replaceAll("\\s", "_"));
+        return GamePlatform.valueOf(name);
     }
 }

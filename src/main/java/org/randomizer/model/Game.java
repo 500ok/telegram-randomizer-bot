@@ -1,11 +1,9 @@
 package org.randomizer.model;
 
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.randomizer.util.GameDeserializer;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,7 +12,6 @@ import java.util.Map;
 @Setter
 @Getter
 @NoArgsConstructor
-@JsonDeserialize(using = GameDeserializer.class)
 public class Game {
 
     private String name;
@@ -25,4 +22,15 @@ public class Game {
     private LocalDate releaseDate;
     private Map<String, String> stores;
 
+    public void addPlatform(String platform) {
+        this.platforms.add(platform);
+    }
+
+    public void addGenre(String genre) {
+        this.genres.add(genre);
+    }
+
+    public void addStore(String name, String link) {
+        this.stores.put(name, link);
+    }
 }

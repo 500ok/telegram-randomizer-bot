@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 public class GameMessageFormatter implements MessageFormatter<Game> {
     @Override
     public String getFormattedMessage(Game game) {
+        if (game == null) return null;
         StringBuilder builder = new StringBuilder("*Name*: \n" + game.getName() + '\n');
         if (game.getDescription() != null && !game.getDescription().equals("")) {
             if (game.getDescription().length() > 3500)

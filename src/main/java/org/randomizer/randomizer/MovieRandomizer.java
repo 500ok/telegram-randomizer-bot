@@ -1,15 +1,12 @@
 package org.randomizer.randomizer;
 
 import kong.unirest.*;
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.randomizer.model.Movie;
+import org.randomizer.util.MovieDeserializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
@@ -17,7 +14,12 @@ public class MovieRandomizer {
     private static final String servicePath = "https://api.themoviedb.org/3";
     @Value("${movie.token}")
     private String token;
-    private static final int total_pages = 500;
+    private MovieDeserializer deserializer;
+
+    @Autowired
+    public MovieRandomizer(MovieDeserializer deserializer) {
+        this.deserializer = deserializer;
+    }
 
     public MovieRandomizer() { }
 
@@ -34,7 +36,7 @@ public class MovieRandomizer {
                 .routeParam("id", id);
 
         log.debug("Request {} movie: {}", id, request.getUrl());
-        HttpResponse<Movie> response = request.asObject(Movie.class);
+        HttpResponse<JsonNode> response = request.asJson();
         log.debug("Movie {} response status {}: {}", id, response.getStatus(), response.getStatusText());
 
         if (response.getStatus() != 200) {
@@ -42,24 +44,12 @@ public class MovieRandomizer {
             return null;
         }
 
-        Movie movie = response.getBody();
-
-        Optional<UnirestParsingException> exception = response.getParsingError();
-        if(exception.isPresent()){
-            log.error("Unirest movie {} parsing exception {}: {}",
-                    id,
-                    request.getUrl(),
-                    exception.get().toString());
-            return null;
-        }
-
-        return movie;
+        return deserializer.deserialize(response.getBody());
     }
 
     private String getRandomMovieId() {
-        HttpRequest<?> request = Unirest.get(servicePath + "/discover/movie")
-                .queryString("api_key", token)
-                .queryString("page", ThreadLocalRandom.current().nextInt(total_pages));
+        HttpRequest<?> request = Unirest.get(servicePath + "/discover/movie?sort_by=popularity.desc")
+                .queryString("api_key", token);
 
         log.debug("Generating random movie id");
         HttpResponse<JsonNode> response = request.asJson();
@@ -70,22 +60,9 @@ public class MovieRandomizer {
             return null;
         }
 
-        Optional<UnirestParsingException> exception = response.getParsingError();
-        if(exception.isPresent()){
-            log.error("Unirest movie id parsing exception {}: {}",
-                    exception.get().getOriginalBody(),
-                    exception.get().toString()
-            );
-            return null;
-        }
-
-        JSONArray jsonMovies = response.getBody().getObject().getJSONArray("results");
-        JSONObject jsonMovie = jsonMovies.getJSONObject(ThreadLocalRandom.current()
-                .nextInt(jsonMovies.length()));
-
-        String identifier = jsonMovie.get("id").toString();
-
+        String identifier = String.valueOf(deserializer.deserializeId(response.getBody()));
         log.debug("Generated movie id {}", identifier);
+
         return identifier;
     }
 }

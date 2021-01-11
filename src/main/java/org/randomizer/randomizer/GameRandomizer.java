@@ -1,16 +1,15 @@
 package org.randomizer.randomizer;
 
 import kong.unirest.*;
-import kong.unirest.json.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.randomizer.model.Game;
+import org.randomizer.util.GameDeserializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
@@ -20,6 +19,12 @@ public class GameRandomizer {
     @Value("${game.token}")
     private String token;
     private Map<String, String> headers;
+    private GameDeserializer deserializer;
+
+    @Autowired
+    public GameRandomizer(GameDeserializer deserializer) {
+        this.deserializer = deserializer;
+    }
 
     @PostConstruct
     private void init() {
@@ -32,7 +37,7 @@ public class GameRandomizer {
 
 
     public Game getRandomGame() {
-        String randomId =  generateGameId();
+        String randomId = generateGameId();
         Game game = getGameById(randomId);
         log.debug("Game randomized: {}", randomId);
         return game;
@@ -45,7 +50,7 @@ public class GameRandomizer {
                                     .headers(headers);
         log.debug("Request {} game: {}", id, request.getUrl());
 
-        HttpResponse<Game> response = request.asObject(Game.class);
+        HttpResponse<JsonNode> response = request.asJson();
 
         log.debug("Game {} response status: {} {}", id, response.getStatus(), response.getStatusText());
 
@@ -54,20 +59,11 @@ public class GameRandomizer {
             return null;
         }
 
-        Game game = response.getBody();
+        Game game = deserializer.deserialize(response.getBody());
 
         if (game.getName().equals("redirect")) {
             log.debug("Received redirect game, request redirected game {}", game.getName());
             return getGameById(game.getName());
-        }
-
-        Optional<UnirestParsingException> exception = response.getParsingError();
-        if(exception.isPresent()){
-            log.error("Unirest game {} parsing exception {}: {}",
-                    id,
-                    request.getUrl(),
-                    exception.get().toString());
-            return null;
         }
 
         return game;
@@ -90,18 +86,7 @@ public class GameRandomizer {
             return null;
         }
 
-        Optional<UnirestParsingException> exception = response.getParsingError();
-        if(exception.isPresent()){
-            log.error("Unirest game id parsing exception {}: {}",
-                    exception.get().getOriginalBody(),
-                    exception.get().toString()
-            );
-            return null;
-        }
-
-        JSONObject jsonBody = response.getBody().getObject();
-        String identifier = String.valueOf(ThreadLocalRandom.current()
-                .nextInt(0 ,(int) jsonBody.get("count")));
+        String identifier = String.valueOf(deserializer.deserializeId(response.getBody()));
 
         log.debug("Generated game id {}", identifier);
         return identifier;
