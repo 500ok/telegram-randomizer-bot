@@ -1,6 +1,6 @@
 package org.randomizer.bot.menu;
 
-public enum MenuState {
+public enum BotState {
 
     MAIN,
 

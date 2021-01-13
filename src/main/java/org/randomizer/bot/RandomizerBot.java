@@ -25,7 +25,7 @@ public class RandomizerBot extends TelegramWebhookBot {
     private String name;
 
     @Autowired
-    private MessageHandler messageHandler;
+    private UpdateDispatcher updateDispatcher;
 
     public RandomizerBot(@Autowired DefaultBotOptions options) {
         super(options);
@@ -39,8 +39,6 @@ public class RandomizerBot extends TelegramWebhookBot {
                             getBotToken(), getBotPath())).asJson();
         log.debug("Bot {} was registered", name);
     }
-
-
 
     @Override
     public String getBotPath() {
@@ -59,6 +57,6 @@ public class RandomizerBot extends TelegramWebhookBot {
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-        return messageHandler.handle(update.getMessage());
+        return updateDispatcher.dispatch(update);
     }
 }

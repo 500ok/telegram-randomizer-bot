@@ -1,6 +1,7 @@
 package org.randomizer.model;
 
-public enum FilmGenre {
+public enum MovieGenre {
+
     ACTION(28),
     ADVENTURE(12),
     ANIMATION(16),
@@ -24,9 +25,9 @@ public enum FilmGenre {
     ;
 
 
-    private int id;
+    private final int id;
 
-    FilmGenre(int i) {
+    MovieGenre(int i) {
         this.id = i;
     }
 
@@ -34,7 +35,7 @@ public enum FilmGenre {
         return id;
     }
 
-    public static FilmGenre getGenreByName(String name) {
-        return FilmGenre.valueOf(name);
+    public static MovieGenre getGenreByName(String name) {
+        return MovieGenre.valueOf(name);
     }
 }

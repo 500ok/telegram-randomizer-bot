@@ -4,7 +4,7 @@ import org.randomizer.model.Game;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GameMessageFormatter implements MessageFormatter<Game> {
+public class GameFormatter implements MessageFormatter<Game> {
     @Override
     public String getFormattedMessage(Game game) {
         if (game == null) return null;

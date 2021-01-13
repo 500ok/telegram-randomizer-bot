@@ -1,6 +1,7 @@
 package org.randomizer.model;
 
 public enum GamePlatform {
+
     PC("pc"),
     PLAYSTATION5("playstation5"),
     XBOX_ONE("xbox-one"),
@@ -17,7 +18,7 @@ public enum GamePlatform {
 
     ;
 
-    private String name;
+    private final String name;
 
     GamePlatform(String name) {
         this.name = name;

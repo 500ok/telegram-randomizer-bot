@@ -9,16 +9,14 @@ public class MovieFormatter implements MessageFormatter<Movie> {
 
     @Override
     public String getFormattedMessage(Movie movie) {
-        StringBuilder builder = new StringBuilder("*Title*: \n" + movie.getTitle() + '\n');
-        builder.append("*Overview*: \n")
-                .append(movie.getOverview().replaceAll("[_*<>]", ""))
-                .append('\n');
-        builder.append("*Genres*: \n").append(movie.getGenres()).append('\n');
-        builder.append("*Spoken languages*: \n").append(movie.getSpokenLanguages()).append('\n');
-        builder.append("*Release date*: \n").append(movie.getReleaseDate()).append('\n');
-        builder.append("*Status*: \n").append(movie.getStatus()).append("\n");
-        builder.append(String.format("[poster](%s) ", posterPath + movie.getPoster()));
 
-        return builder.toString();
+        return "*Title*: \n" + movie.getTitle() + '\n' + "*Overview*: \n" +
+                movie.getOverview().replaceAll("[_*<>]", "") +
+                '\n' +
+                "*Genres*: \n" + movie.getGenres() + '\n' +
+                "*Spoken languages*: \n" + movie.getSpokenLanguages() + '\n' +
+                "*Release date*: \n" + movie.getReleaseDate() + '\n' +
+                "*Status*: \n" + movie.getStatus() + "\n" +
+                String.format("[poster](%s) ", posterPath + movie.getPoster());
     }
 }

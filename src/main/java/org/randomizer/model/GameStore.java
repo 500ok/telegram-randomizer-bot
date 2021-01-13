@@ -1,6 +1,7 @@
 package org.randomizer.model;
 
 public enum GameStore {
+
     STEAM("steam"),
     PLAYSTATION_STORE("playstation-store"),
     XBOX_STORE("xbox-store"),
@@ -12,7 +13,7 @@ public enum GameStore {
 
     ;
 
-    private String name;
+    private final String name;
 
     GameStore(String name) {
         this.name = name;

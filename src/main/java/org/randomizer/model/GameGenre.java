@@ -1,6 +1,7 @@
 package org.randomizer.model;
 
 public enum GameGenre {
+
     ACTION(4),
     INDIE(51),
     ADVENTURE(3),
@@ -23,7 +24,7 @@ public enum GameGenre {
 
     ;
 
-    private int id;
+    private final int id;
 
     GameGenre(int id) {
         this.id = id;
