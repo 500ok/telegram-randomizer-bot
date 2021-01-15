@@ -4,9 +4,9 @@ import org.randomizer.model.UserData;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 
-public interface CallbackQueryHandler {
+public interface MessageHandler {
 
-     BotApiMethod<?> handle(UserData userData, CallbackQuery query);
+     BotApiMethod<?> handle(UserData userData, String messageData);
      BotState getState();
 
 }

@@ -7,11 +7,13 @@ import org.randomizer.bot.menu.BotState;
 public class UserData {
 
     private final Long id;
+    private Integer menuId;
     private BotState state;
     private GameFilter gameFilter;
     private MovieFilter movieFilter;
 
     public UserData(Long id, BotState state) {
         this.id = id;
+        this.state = state;
     }
 }

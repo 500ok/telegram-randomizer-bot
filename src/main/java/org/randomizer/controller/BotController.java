@@ -22,7 +22,9 @@ public class BotController {
 
     @PostMapping("/")
     public BotApiMethod<?> update(@RequestBody Update update) {
-        log.debug(update.getMessage().toString());
-        return randomizerBot.onWebhookUpdateReceived(update);
+        log.debug(update.toString());
+        BotApiMethod<?> response = randomizerBot.onWebhookUpdateReceived(update);
+        log.debug(response.toString());
+        return response;
     }
 }
