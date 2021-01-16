@@ -13,21 +13,14 @@ public enum GameStore {
 
     ;
 
-    private final String name;
+    private final String title;
 
-    GameStore(String name) {
-        this.name = name;
+    GameStore(String title) {
+        this.title = title;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public String getReadableName() {
-        return this.toString().replaceAll("[\\-_]", " ");
-    }
-
-    public static String getValueByName(String name) {
-        return GameStore.valueOf(name.toUpperCase().replaceAll("\\s", "_")).getName();
-    }
 }

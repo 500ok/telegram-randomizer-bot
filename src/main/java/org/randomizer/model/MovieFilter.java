@@ -9,7 +9,7 @@ public class MovieFilter {
 
     private Set<MovieGenre> genres;
 
-    public void clearFilter() {
+    public void clear() {
         genres.clear();
     }
 }

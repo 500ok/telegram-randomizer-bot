@@ -11,7 +11,7 @@ public class GameFilter {
     private Set<GameGenre> genres;
     private Set<GameStore> stores;
 
-    public void clearFilter() {
+    public void clear() {
         platforms.clear();
         genres.clear();
         stores.clear();

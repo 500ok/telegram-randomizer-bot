@@ -2,14 +2,25 @@ package org.randomizer.bot.menu;
 
 public enum BotState {
 
-    MAIN,
+    NEW("Main menu"),
 
-    GAME_MAIN,
-    GAME_GENRE_FILTER,
-    GAME_PLATFORM_FILTER,
-    GAME_STORE_FILTER,
+    MAIN("Main menu"),
 
-    MOVIE_MAIN,
-    MOVIE_GENRE_FILTER
+    GAME_MAIN("Game menu"),
+    GAME_GENRE_FILTER("Genre filter"),
+    GAME_PLATFORM_FILTER("Platform filter"),
+    GAME_STORE_FILTER("Store filter"),
 
+    MOVIE_MAIN("Movie menu"),
+    MOVIE_GENRE_FILTER("Genre filter");
+
+    private final String description;
+
+    BotState(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }

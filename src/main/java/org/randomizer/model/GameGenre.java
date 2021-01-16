@@ -2,39 +2,43 @@ package org.randomizer.model;
 
 public enum GameGenre {
 
-    ACTION(4),
-    INDIE(51),
-    ADVENTURE(3),
-    RPG(5),
-    STRATEGY(10),
-    SHOOTER(2),
-    CASUAL(40),
-    SIMULATION(14),
-    PUZZLE(7),
-    ARCADE(11),
-    PLATFORMER(83),
-    RACING(1),
-    SPORTS(15),
-    MMO(59),
-    FIGHTING(6),
-    FAMILY(19),
-    BOARD_GAMES(28),
-    EDUCATIONAL(34),
-    CARD(17)
+    ACTION(4, "Action"),
+    INDIE(51, "Indie"),
+    ADVENTURE(3, "Adventure"),
+    RPG(5, "RPG"),
+    STRATEGY(10, "Strategy"),
+    SHOOTER(2, "Shooter"),
+    CASUAL(40, "Casual"),
+    SIMULATION(14, "Simulation"),
+    PUZZLE(7, "Puzzle"),
+    ARCADE(11, "Arcade"),
+    PLATFORMER(83, "Platformer"),
+    RACING(1, "Racing"),
+    SPORTS(15, "Sports"),
+    MMO(59, "MMO"),
+    FIGHTING(6, "Fighting"),
+    FAMILY(19, "Family"),
+    BOARD_GAMES(28, "Board games"),
+    EDUCATIONAL(34, "Educational"),
+    CARD(17, "Card")
 
     ;
 
     private final int id;
 
-    GameGenre(int id) {
+    private final String title;
+
+    GameGenre(int id, String title) {
         this.id = id;
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public int getId() {
         return id;
     }
 
-    public static GamePlatform getValueByName(String name) {
-        return GamePlatform.valueOf(name);
-    }
 }

@@ -18,21 +18,14 @@ public enum GamePlatform {
 
     ;
 
-    private final String name;
+    private final String title;
 
-    GamePlatform(String name) {
-        this.name = name;
+    GamePlatform(String title) {
+        this.title = title;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public String getReadableName() {
-        return this.toString().replaceAll("[\\-_]", " ");
-    }
-
-    public static GamePlatform getValueByName(String name) {
-       return GamePlatform.valueOf(name.toUpperCase().replaceAll("\\s", "_"));
-    }
 }

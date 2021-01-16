@@ -30,7 +30,8 @@ public class RAWGGameDeserializer implements GameDeserializer {
 
         game.setName(rootObj.getString("name"));
         game.setDescription(rootObj.getString("description_raw"));
-        game.setBackgroundImage(rootObj.getString("background_image"));
+        game.setBackgroundImage(!rootObj.isNull("background_image")?
+                rootObj.getString("background_image"): null);
 
         String released =  !rootObj.isNull("released")? rootObj.getString("released"): null;
         LocalDate releasedDate = released != null? LocalDate.parse(released): null;

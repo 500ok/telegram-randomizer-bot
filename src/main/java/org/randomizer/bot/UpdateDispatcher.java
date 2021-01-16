@@ -1,14 +1,9 @@
 package org.randomizer.bot;
 
 import lombok.extern.slf4j.Slf4j;
-import org.randomizer.bot.formatter.MessageFormatter;
 import org.randomizer.bot.menu.BotState;
 import org.randomizer.bot.menu.MessageHandler;
-import org.randomizer.model.Game;
-import org.randomizer.model.Movie;
 import org.randomizer.model.UserData;
-import org.randomizer.randomizer.GameRandomizer;
-import org.randomizer.randomizer.MovieRandomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -20,15 +15,6 @@ import java.util.Arrays;
 @Slf4j
 @Component
 public class UpdateDispatcher {
-
-    @Autowired
-    private MessageFormatter<Game> gameMessageFormatter;
-    @Autowired
-    private MessageFormatter<Movie> movieMessageFormatter;
-    @Autowired
-    private GameRandomizer gameRandomizer;
-    @Autowired
-    private MovieRandomizer movieRandomizer;
 
     private final BotContext context;
 
@@ -60,13 +46,21 @@ public class UpdateDispatcher {
             CallbackQuery query = update.getCallbackQuery();
             String[] queryParam = query.getData().split(":");
             log.debug("Received callback query \"{}\" from {}", Arrays.toString(queryParam), userId);
-            handler = context.getHandlerByState(BotState.valueOf(queryParam[0]));
-            if (handler == null)
-                handler = context.getHandlerByState(data.getState());
 
-            message = handler.handle(data, queryParam.length > 1? queryParam[1]: null);
+            BotState actionState = BotState.valueOf(queryParam[0]);
+            if (actionState == BotState.NEW) {
+                handler = context.getHandlerByState(BotState.MAIN);
+                message = handler.handle(data, null);
+            } else {
+                handler = context.getHandlerByState(actionState);
+
+                if (handler == null)
+                    handler = context.getHandlerByState(data.getState());
+
+                message = handler.handle(data, queryParam.length > 1? queryParam[1]: null);
+            }
         } else {
-            data.setState(BotState.MAIN);
+            data.setState(BotState.NEW);
             handler = context.getHandlerByState(BotState.MAIN);
             message = handler.handle(data, null);
         }

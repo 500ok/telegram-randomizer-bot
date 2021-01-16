@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -14,12 +15,19 @@ import java.util.List;
 @Component
 public class MainMenuHandler implements MessageHandler {
 
-    private final List<BotState> menuOptions = List.of(BotState.GAME_MAIN, BotState.MOVIE_MAIN);
+    private final List<BotState> menuOptions = List.of(
+            BotState.GAME_MAIN,
+            BotState.MOVIE_MAIN
+    );
 
     @Override
     public BotApiMethod<?> handle(UserData userData, String messageData) {
-        if (messageData == null)
-            return createMainMenu(userData.getId());
+
+        if (userData.getState() == BotState.NEW) {
+            return createMainMenu(userData);
+        }
+
+        userData.setState(getState());
 
         return updateToMainMenu(userData);
     }
@@ -32,10 +40,11 @@ public class MainMenuHandler implements MessageHandler {
         return editMessageReplyMarkup;
     }
 
-    private BotApiMethod<?> createMainMenu(Long userId) {
+    private BotApiMethod<?> createMainMenu(UserData data) {
         SendMessage message = new SendMessage();
+        message.setReplyToMessageId(data.getMenuId());
         message.setReplyMarkup(createKeyboard());
-        message.setChatId(userId.toString());
+        message.setChatId(data.getId().toString());
         message.setText("MENU");
         message.setParseMode("HTML");
         return message;
@@ -49,7 +58,7 @@ public class MainMenuHandler implements MessageHandler {
         for (BotState menu: menuOptions) {
 
             InlineKeyboardButton menuButton = new InlineKeyboardButton();
-            menuButton.setText(menu.name());
+            menuButton.setText(menu.getDescription());
             menuButton.setCallbackData(menu.name());
             keyboardRow.add(menuButton);
         }
