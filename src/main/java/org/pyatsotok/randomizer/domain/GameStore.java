@@ -2,16 +2,14 @@ package org.pyatsotok.randomizer.domain;
 
 public enum GameStore {
 
-    STEAM("steam"),
-    PLAYSTATION_STORE("playstation-store"),
-    XBOX_STORE("xbox-store"),
-    APP_STORE("apple-appstore"),
+    STEAM("Steam"),
+    PLAYSTATION_STORE("Playstation store"),
+    XBOX_STORE("Xbox Store"),
+    APP_STORE("Appstore"),
     GOG("gog"),
-    NINTENDO_STORE("nintendo"),
-    GOOGLE_PLAY("google-play"),
-    EPIC_GAMES("epic")
-
-    ;
+    NINTENDO_STORE("Nintendo"),
+    GOOGLE_PLAY("Google Play"),
+    EPIC_GAMES("EGS");
 
     private final String title;
 

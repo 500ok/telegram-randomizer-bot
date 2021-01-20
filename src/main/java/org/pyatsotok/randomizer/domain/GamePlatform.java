@@ -2,21 +2,19 @@ package org.pyatsotok.randomizer.domain;
 
 public enum GamePlatform {
 
-    PC("pc"),
-    PLAYSTATION5("playstation5"),
-    XBOX_ONE("xbox-one"),
-    PLAYSTATION4("playstation4"),
-    XBOX_SERIES_X("xbox-series-x"),
-    NINTENDO_SWITCH("nintendo-switch"),
-    IOS("ios"),
-    ANDROID("android"),
-    MACOS("macOS"),
-    LINUX("linux"),
-    XBOX360("xbox360"),
-    PLAYSTATION3("playstation3"),
-    PLAYSTATION2("playstation2")
-
-    ;
+    PC("PC"),
+    PLAYSTATION5("Playstation 5"),
+    XBOX_ONE("Xbox One"),
+    PLAYSTATION4("Playstation 4"),
+    XBOX_SERIES_X("Xbox Series X"),
+    NINTENDO_SWITCH("Nintendo Switch"),
+    IOS("IOS"),
+    ANDROID("Android"),
+    MACOS("MacOS"),
+    LINUX("Linux"),
+    XBOX360("Xbox360"),
+    PLAYSTATION3("Playstation 3"),
+    PLAYSTATION2("Playstation 2");
 
     private final String title;
 

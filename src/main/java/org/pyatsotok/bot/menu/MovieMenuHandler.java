@@ -19,9 +19,14 @@ import java.util.List;
 @Component
 public class MovieMenuHandler implements MessageHandler {
 
+    private static final List<BotState> menuOptions = List.of(
+            BotState.MOVIE_GENRE_FILTER
+    );
+
     private final MessageFormatter<Movie> movieMessageFormatter;
 
     private final MovieRandomizer movieRandomizer;
+
 
     @Autowired
     public MovieMenuHandler(MessageFormatter<Movie> movieMessageFormatter, MovieRandomizer movieRandomizer) {
@@ -29,28 +34,32 @@ public class MovieMenuHandler implements MessageHandler {
         this.movieRandomizer = movieRandomizer;
     }
 
-    private final List<BotState> menuOptions = List.of(
-            BotState.MOVIE_GENRE_FILTER
-    );
-
     @Override
     public BotApiMethod<?> handle(UserData userData, String messageData) {
         userData.setState(getState());
 
         if (messageData != null && !messageData.isBlank()) {
             if ("generate".equals(messageData)) {
-                return updateGameMessage(userData);
+                return updateMovieMessage(userData);
             }
         }
 
         return updateMenu(userData);
     }
 
-    private BotApiMethod<?> updateGameMessage(UserData data) {
+    private BotApiMethod<?> updateMovieMessage(UserData data) {
         EditMessageText editMessageText = new EditMessageText();
 
         String message = "Try again.";
-        Movie movie = movieRandomizer.getRandomMovie();
+        Movie movie;
+
+        if (data.getMovieFilter().isEmpty()) {
+            movie = movieRandomizer.getRandomMovie();
+        } else {
+            movie = movieRandomizer.getRandomMovie(data.getMovieFilter());
+            data.getMovieFilter().clear();
+        }
+
         if (movie != null)
             message = movieMessageFormatter.getFormattedMessage(movie);
 
@@ -60,11 +69,6 @@ public class MovieMenuHandler implements MessageHandler {
         InlineKeyboardButton toMenu = new InlineKeyboardButton();
         toMenu.setText(BotState.MAIN.getDescription());
         toMenu.setCallbackData(BotState.NEW.name());
-        editMessageText.setReplyMarkup(
-                new InlineKeyboardMarkup(List.of(List.of(
-                    toMenu
-                )))
-        );
         editMessageText.setMessageId(data.getMenuId());
         editMessageText.setChatId(data.getId().toString());
         return editMessageText;
@@ -85,7 +89,7 @@ public class MovieMenuHandler implements MessageHandler {
         for (BotState menu: menuOptions) {
             InlineKeyboardButton gameFilterButton = new InlineKeyboardButton();
             gameFilterButton.setText(menu.getDescription());
-            gameFilterButton.setCallbackData(getState().name());
+            gameFilterButton.setCallbackData(menu.name());
             keyboardRows.add(List.of(gameFilterButton));
         }
 

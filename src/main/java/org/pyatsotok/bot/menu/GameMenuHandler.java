@@ -64,11 +64,6 @@ public class GameMenuHandler implements MessageHandler {
         InlineKeyboardButton toMenu = new InlineKeyboardButton();
         toMenu.setText(BotState.MAIN.getDescription());
         toMenu.setCallbackData(BotState.MAIN.name());
-        editMessageText.setReplyMarkup(
-                new InlineKeyboardMarkup(List.of(List.of(
-                        toMenu
-                )))
-        );
         editMessageText.setMessageId(data.getMenuId());
         editMessageText.setChatId(data.getId().toString());
         return editMessageText;

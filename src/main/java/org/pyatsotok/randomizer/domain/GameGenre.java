@@ -20,9 +20,7 @@ public enum GameGenre {
     FAMILY(19, "Family"),
     BOARD_GAMES(28, "Board games"),
     EDUCATIONAL(34, "Educational"),
-    CARD(17, "Card")
-
-    ;
+    CARD(17, "Card");
 
     private final int id;
 

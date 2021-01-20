@@ -11,6 +11,7 @@ import org.pyatsotok.randomizer.domain.Game;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -25,6 +26,14 @@ public class RAWGGameSource implements GameSource {
     @Value("${game.token}")
     private String token;
     private Map<String, String> headers;
+
+    @PostConstruct
+    private void init() {
+        headers = Map.of(
+                "x-rapidapi-key", token,
+                "x-rapidapi-host", "rawg-video-games-database.p.rapidapi.com"
+        );
+    }
 
     @Override
     public Game getRandomGame() {

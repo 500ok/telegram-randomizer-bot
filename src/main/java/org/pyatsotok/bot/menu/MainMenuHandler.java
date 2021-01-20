@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 public class MainMenuHandler implements MessageHandler {
 
-    private final List<BotState> menuOptions = List.of(
+    private static final List<BotState> menuOptions = List.of(
             BotState.GAME_MAIN,
             BotState.MOVIE_MAIN
     );
@@ -41,7 +41,6 @@ public class MainMenuHandler implements MessageHandler {
 
     private BotApiMethod<?> createMainMenu(UserData data) {
         SendMessage message = new SendMessage();
-        message.setReplyToMessageId(data.getMenuId());
         message.setReplyMarkup(createKeyboard());
         message.setChatId(data.getId().toString());
         message.setText("MENU");

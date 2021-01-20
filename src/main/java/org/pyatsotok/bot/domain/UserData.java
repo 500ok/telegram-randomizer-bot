@@ -11,8 +11,8 @@ public class UserData {
     private final Long id;
     private Integer menuId;
     private BotState state;
-    private GameFilter gameFilter;
-    private MovieFilter movieFilter;
+    private GameFilter gameFilter = new GameFilter();
+    private MovieFilter movieFilter = new MovieFilter();
 
     public UserData(Long id, BotState state) {
         this.id = id;

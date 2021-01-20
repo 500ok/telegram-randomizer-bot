@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameRandomizer {
 
-
     private final GameSource source;
 
     @Autowired

@@ -1,17 +1,13 @@
 package org.pyatsotok.randomizer.domain;
 
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-@Setter
-@Getter
-@NoArgsConstructor
+@Data
 public class Game {
 
     private String name;
