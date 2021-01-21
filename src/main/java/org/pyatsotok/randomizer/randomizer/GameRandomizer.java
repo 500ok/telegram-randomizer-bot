@@ -2,6 +2,7 @@ package org.pyatsotok.randomizer.randomizer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.pyatsotok.randomizer.domain.Game;
+import org.pyatsotok.randomizer.domain.GameFilter;
 import org.pyatsotok.randomizer.source.GameSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,5 +20,9 @@ public class GameRandomizer {
 
     public Game getRandomGame() {
         return source.getRandomGame();
+    }
+
+    public Game getRandomGame(GameFilter filter) {
+        return source.getRandomGame(filter);
     }
 }

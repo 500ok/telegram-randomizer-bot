@@ -29,4 +29,15 @@ public class Game {
     public void addStore(String name, String link) {
         this.stores.put(name, link);
     }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "name='" + name + '\'' +
+                ", platforms=" + platforms +
+                ", genres=" + genres +
+                ", releaseDate=" + releaseDate +
+                ", stores=" + stores +
+                '}';
+    }
 }

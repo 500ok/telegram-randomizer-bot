@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-public class MovieGenreFilterHandler implements MessageHandler {
+public class MovieGenreMenuHandler implements MessageHandler {
 
     @Override
     public BotApiMethod<?> handle(UserData userData, String messageData) {

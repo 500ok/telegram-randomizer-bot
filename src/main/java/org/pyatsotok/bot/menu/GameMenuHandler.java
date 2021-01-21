@@ -19,6 +19,12 @@ import java.util.List;
 @Component
 public class GameMenuHandler implements MessageHandler {
 
+    private static final List<BotState> menuOptions = List.of(
+            BotState.GAME_GENRE_FILTER,
+            BotState.GAME_STORE_FILTER,
+            BotState.GAME_PLATFORM_FILTER
+    );
+
     private final MessageFormatter<Game> gameMessageFormatter;
 
     private final GameRandomizer gameRandomizer;
@@ -30,19 +36,12 @@ public class GameMenuHandler implements MessageHandler {
     }
 
 
-    private final List<BotState> menuOptions = List.of(
-            BotState.GAME_GENRE_FILTER,
-            BotState.GAME_STORE_FILTER,
-            BotState.GAME_PLATFORM_FILTER
-    );
-
     @Override
     public BotApiMethod<?> handle(UserData userData, String messageData) {
         userData.setState(getState());
 
         if (messageData != null && !messageData.isBlank()) {
             if ("generate".equals(messageData)) {
-                userData.setState(BotState.NEW);
                 return updateGameMessage(userData);
             }
         }
@@ -54,7 +53,15 @@ public class GameMenuHandler implements MessageHandler {
         EditMessageText editMessageText = new EditMessageText();
 
         String message = "Try again.";
-        Game game = gameRandomizer.getRandomGame();
+        Game game;
+
+        if (data.getGameFilter().isEmpty()) {
+            game = gameRandomizer.getRandomGame();
+        } else {
+            game = gameRandomizer.getRandomGame(data.getGameFilter());
+            data.getGameFilter().clear();
+        }
+
         if (game != null)
             message = gameMessageFormatter.getFormattedMessage(game);
 
@@ -63,9 +70,10 @@ public class GameMenuHandler implements MessageHandler {
         
         InlineKeyboardButton toMenu = new InlineKeyboardButton();
         toMenu.setText(BotState.MAIN.getDescription());
-        toMenu.setCallbackData(BotState.MAIN.name());
+        toMenu.setCallbackData(BotState.NEW.name());
         editMessageText.setMessageId(data.getMenuId());
         editMessageText.setChatId(data.getId().toString());
+
         return editMessageText;
     }
 
@@ -82,10 +90,9 @@ public class GameMenuHandler implements MessageHandler {
         List<List<InlineKeyboardButton>> keyboardRows = new ArrayList<>();
 
         for (BotState menu: menuOptions) {
-
             InlineKeyboardButton gameFilterButton = new InlineKeyboardButton();
             gameFilterButton.setText(menu.getDescription());
-            gameFilterButton.setCallbackData(getState().name());
+            gameFilterButton.setCallbackData(menu.name());
             keyboardRows.add(List.of(gameFilterButton));
         }
 
